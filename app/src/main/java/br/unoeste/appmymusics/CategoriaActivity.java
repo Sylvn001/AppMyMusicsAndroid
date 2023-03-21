@@ -4,16 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import br.unoeste.appmymusics.db.bean.Genero;
@@ -23,7 +27,12 @@ public class CategoriaActivity extends AppCompatActivity {
     private ListView lvCategoria;
     private Button btConfirmar;
     private EditText etGenero;
+
+    private FloatingActionButton fabNovaCategoria;
     private LinearLayout linearLayout;
+
+    private ArrayList<Genero> generos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,41 +40,80 @@ public class CategoriaActivity extends AppCompatActivity {
         lvCategoria = findViewById(R.id.lvCategoria);
         linearLayout = findViewById(R.id.linearLayout);
         btConfirmar=findViewById(R.id.btConfirmar);
-        etGenero=findViewById(R.id.etNomeGenero);
-        ArrayList<Genero> generos=new GeneroDAL(this).get("");
+        etGenero=findViewById(R.id.etGenero);
+        this.generos= new GeneroDAL(this).get("");
         ArrayAdapter<Genero> adapter=new ArrayAdapter<Genero>(this,
                 android.R.layout.simple_list_item_1,generos);
         lvCategoria.setAdapter(adapter);
+
+        lvCategoria.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                linearLayout.setVisibility(View.VISIBLE);
+                Genero genero = generos.get(i);
+                etGenero.setText(genero.getNome());
+            }
+        });
+
+        lvCategoria.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Snackbar sbar;
+                sbar = Snackbar.make(view, "Deseja apagar a categoria?", Snackbar.LENGTH_LONG);
+                sbar.show();
+                sbar.setAction("Apagar ?", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Genero genero =  generos.get(i);
+                        System.out.println(genero.getId());
+                        if(genero.getId() > 0){
+                            apagarGenero(genero);
+                        }
+                    }
+                });
+                return true;
+            }
+        });
+
+        fabNovaCategoria =  findViewById(R.id.fabNovaCategoria);
+
+        fabNovaCategoria.setOnClickListener(e-> {
+            linearLayout.setVisibility(View.VISIBLE);
+            etGenero.setText("");
+            etGenero.requestFocus();
+        });
+
         linearLayout.setVisibility(View.GONE);
         btConfirmar.setOnClickListener(e->{
             cadastrarGenero();
             linearLayout.setVisibility(View.GONE);
         });
-
     }
 
     private void cadastrarGenero() {
+
         GeneroDAL dal = new GeneroDAL(this);
         Genero genero=new Genero(etGenero.getText().toString());
         dal.salvar(genero);
-        this.atualizaListaCategorias();
+        this.atualizarDados();
+    }
+
+    private void atualizarGenero(Genero genero) {
+        GeneroDAL dal = new GeneroDAL(this);
+        dal.alterar(genero);
+        this.atualizarDados();
     }
 
     private void apagarGenero(Genero genero){
         GeneroDAL dal = new GeneroDAL(this);
-        dal.apagar(1);
-        this.atualizaListaCategorias();
+        dal.apagar(genero.getId());
+        this.atualizarDados();
     }
 
-    private void editarGenero(Genero genero){
-        GeneroDAL dal = new GeneroDAL(this);
-        //dal.alterar("");
-        this.atualizaListaCategorias();
-    }
-
-    private void atualizaListaCategorias(){
-        ArrayList<Genero> generos=new GeneroDAL(this).get("");
-        ArrayAdapter<Genero> adapter = new ArrayAdapter(this, android.R.layout.simple_expandable_list_item_1, generos);
+    private void atualizarDados(){
+        this.generos=new GeneroDAL(this).get("");
+        ArrayAdapter<Genero> adapter=new ArrayAdapter<Genero>(this,
+                android.R.layout.simple_list_item_1,generos);
         lvCategoria.setAdapter(adapter);
     }
 
