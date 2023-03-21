@@ -53,7 +53,7 @@ public class CategoriaActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 linearLayout.setVisibility(View.VISIBLE);
                 Genero generoEncontrado = generos.get(i);
-                etGenero.setText(genero.getNome());
+                etGenero.setText(generoEncontrado.getNome().toString());
                 genero = generoEncontrado;
             }
         });
@@ -68,7 +68,6 @@ public class CategoriaActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         Genero genero =  generos.get(i);
-                        System.out.println(genero.getId());
                         if(genero.getId() > 0){
                             apagarGenero(genero);
                         }
