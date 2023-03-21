@@ -33,6 +33,8 @@ public class CategoriaActivity extends AppCompatActivity {
 
     private ArrayList<Genero> generos;
 
+    private Genero genero;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +52,9 @@ public class CategoriaActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 linearLayout.setVisibility(View.VISIBLE);
-                Genero genero = generos.get(i);
+                Genero generoEncontrado = generos.get(i);
                 etGenero.setText(genero.getNome());
+                genero = generoEncontrado;
             }
         });
 
@@ -85,7 +88,12 @@ public class CategoriaActivity extends AppCompatActivity {
 
         linearLayout.setVisibility(View.GONE);
         btConfirmar.setOnClickListener(e->{
-            cadastrarGenero();
+            if(genero != null){
+                atualizarGenero(genero);
+            }else{
+                cadastrarGenero();
+            }
+            genero = null;
             linearLayout.setVisibility(View.GONE);
         });
     }
@@ -99,6 +107,7 @@ public class CategoriaActivity extends AppCompatActivity {
     }
 
     private void atualizarGenero(Genero genero) {
+        genero.setNome(etGenero.getText().toString());
         GeneroDAL dal = new GeneroDAL(this);
         dal.alterar(genero);
         this.atualizarDados();
