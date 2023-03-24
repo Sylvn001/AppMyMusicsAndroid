@@ -7,18 +7,173 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.LinearLayout;
+import android.widget.SearchView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import br.unoeste.appmymusics.db.bean.Genero;
+import br.unoeste.appmymusics.db.bean.Musica;
+import br.unoeste.appmymusics.db.bean.Musica;
+import br.unoeste.appmymusics.db.dal.MusicaDAL;
+import br.unoeste.appmymusics.db.dal.MusicaDAL;
 
 public class MainActivity extends AppCompatActivity {
+    private ListView lvMusica;
+    private Button btConfirmar;
+
+    private EditText etTitulo;
+    private EditText etAno;
+    private EditText etInterprete;
+    private EditText etGenero;
+    private EditText etDuracao;
+
+
+    private FloatingActionButton fabNovaMusica;
+    private LinearLayout linearLayout;
+    private ArrayList<Musica> musicas;
+    private Musica musica;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ListView lvMusica = findViewById(R.id.lvMusicas);
+        linearLayout = findViewById(R.id.linearLayoutMusica);
+        btConfirmar=findViewById(R.id.btConfirmarMusica);
+
+        // textos para input etc
+
+
+        this.musicas= new MusicaDAL(this).get("");
+        ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
+        lvMusica.setAdapter(adapter);
+
+
+        lvMusica.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                linearLayout.setVisibility(View.VISIBLE);
+                Musica musicaEncontrado = musicas.get(i);
+                //etTitulo.setText(musicaEncontrado.getNome().toString());
+                musica = musicaEncontrado;
+            }
+        });
+
+        lvMusica.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Snackbar sbar;
+                sbar = Snackbar.make(view, "Deseja apagar a categoria?", Snackbar.LENGTH_LONG);
+                sbar.show();
+                sbar.setAction("Apagar ?", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Musica musica =  musicas.get(i);
+                        if(musica.getId() > 0){
+                            apagarMusica(musica);
+                        }
+                    }
+                });
+                return true;
+            }
+        });
+
+        fabNovaMusica =  findViewById(R.id.fabNovaMusica);
+
+        fabNovaMusica.setOnClickListener(e-> {
+            linearLayout.setVisibility(View.VISIBLE);
+            //etTitulo.setText("");
+            //etTitulo.requestFocus();
+        });
+
+        linearLayout.setVisibility(View.GONE);
+        btConfirmar.setOnClickListener(e->{
+            if(musica != null){
+                atualizarMusica(musica);
+            }else{
+                cadastrarMusica();
+            }
+            musica = null;
+            linearLayout.setVisibility(View.GONE);
+        });
+
     }
+
+
+    private void cadastrarMusica() {
+        MusicaDAL dal = new MusicaDAL(this);
+//        Musica musica=new Musica(
+//                etTitulo.getText().toString(),
+//                etAno.getText().toString(),
+//                etInterprete.getText().toString(),
+//                new Genero(etGenero.getText()),
+//                Double.parseDouble(etDuracao.getText().toString())
+//        );
+        dal.salvar(musica);
+        this.atualizarDados();
+    }
+
+    private void atualizarMusica(Musica musica) {
+        musica.setTitulo(etTitulo.getText().toString());
+        MusicaDAL dal = new MusicaDAL(this);
+        dal.alterar(musica);
+        this.atualizarDados();
+    }
+
+    private void apagarMusica(Musica musica){
+        MusicaDAL dal = new MusicaDAL(this);
+        dal.apagar(musica.getId());
+        this.atualizarDados();
+    }
+
+    private void atualizarDados(){
+        this.musicas=new MusicaDAL(this).get("");
+        ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this,
+                android.R.layout.simple_list_item_1,musicas);
+        lvMusica.setAdapter(adapter);
+    }
+
+    private void buscarMusica(String text){
+        this.musicas=new MusicaDAL(this).get(text);
+        ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this,
+                android.R.layout.simple_list_item_1,musicas);
+        lvMusica.setAdapter(adapter);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu1,menu);
+
+        MenuItem searchItem = menu.findItem(R.id.itemSearchMusica);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                System.out.println(s);
+                buscarMusica("gen_nome like '%" + s +"%'");
+                return false;
+            }
+        });
+        ;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -27,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
         switch(item.getItemId())
         {
             case R.id.itmusica:
+                linearLayout.setVisibility(View.VISIBLE);
+                etTitulo.setText("");
+                etTitulo.requestFocus();
                 break;
             case R.id.itcategoria:
                 Intent intent = new Intent(this,CategoriaActivity.class);

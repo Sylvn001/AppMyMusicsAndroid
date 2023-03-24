@@ -13,11 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 import br.unoeste.appmymusics.db.bean.Genero;
@@ -40,7 +40,7 @@ public class CategoriaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categoria);
         lvCategoria = findViewById(R.id.lvCategoria);
-        linearLayout = findViewById(R.id.linearLayout);
+        linearLayout = findViewById(R.id.linearLayoutCategoria);
         btConfirmar=findViewById(R.id.btConfirmar);
         etGenero=findViewById(R.id.etGenero);
         this.generos= new GeneroDAL(this).get("");
@@ -98,7 +98,6 @@ public class CategoriaActivity extends AppCompatActivity {
     }
 
     private void cadastrarGenero() {
-
         GeneroDAL dal = new GeneroDAL(this);
         Genero genero=new Genero(etGenero.getText().toString());
         dal.salvar(genero);
@@ -125,9 +124,31 @@ public class CategoriaActivity extends AppCompatActivity {
         lvCategoria.setAdapter(adapter);
     }
 
+    private void buscarCategoria(String text){
+        this.generos=new GeneroDAL(this).get(text);
+        ArrayAdapter<Genero> adapter=new ArrayAdapter<Genero>(this,
+                android.R.layout.simple_list_item_1,generos);
+        lvCategoria.setAdapter(adapter);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu2,menu);
+        MenuItem searchItem = menu.findItem(R.id.itemSearch);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                System.out.println(s);
+                buscarCategoria("gen_nome like '%" + s +"%'");
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -139,7 +160,6 @@ public class CategoriaActivity extends AppCompatActivity {
                 linearLayout.setVisibility(View.VISIBLE);
                 etGenero.setText("");
                 etGenero.requestFocus();
-                // cadastrar nova categoria
                 break;
             case R.id.itvoltar:
                 onBackPressed();
