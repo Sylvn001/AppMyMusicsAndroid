@@ -76,7 +76,7 @@ public class Musica {
 
     @Override
     public String toString() {
-        return  titulo+" ("+genero.getNome()+")";
+        return  "" + String.format("%s - %s - %s MIN - %s - %s (%s)", this.getTitulo(), this.getInterprete(), this.getDuracao(),this.getAno(), this.getGenero().getNome(), getId());
     }
 
 

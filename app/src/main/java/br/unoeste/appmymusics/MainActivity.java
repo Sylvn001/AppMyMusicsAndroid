@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ListView lvMusica = findViewById(R.id.lvMusicas);
+        lvMusica = findViewById(R.id.lvMusicas);
         linearLayout = findViewById(R.id.linearLayoutMusica);
         btConfirmar=findViewById(R.id.btConfirmarMusica);
 
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        autoCompleteTxt.setText(adapterGeneros.getItem(0).toString(), false);
+
         this.musicas= new MusicaDAL(this).get("");
         ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
         lvMusica.setAdapter(adapter);
@@ -83,7 +86,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 linearLayout.setVisibility(View.VISIBLE);
                 Musica musicaEncontrado = musicas.get(i);
-                //etTitulo.setText(musicaEncontrado.getNome().toString());
+                etTitulo.setText(musicaEncontrado.getTitulo().toString());
+                etAno.setText(musicaEncontrado.getAno() + "");
+                etInterprete.setText(musicaEncontrado.getInterprete());
+                etDuracao.setText(musicaEncontrado.getDuracao() + "");
+                generoSelecionado = musicaEncontrado.getGenero();
                 musica = musicaEncontrado;
             }
         });
@@ -91,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Snackbar sbar;
-                sbar = Snackbar.make(view, "Deseja apagar a categoria?", Snackbar.LENGTH_LONG);
+                sbar = Snackbar.make(view, "Deseja apagar a musica?", Snackbar.LENGTH_LONG);
                 sbar.show();
                 sbar.setAction("Apagar ?", new View.OnClickListener() {
                     @Override
@@ -110,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         fabNovaMusica.setOnClickListener(e-> {
             linearLayout.setVisibility(View.VISIBLE);
-            //etTitulo.setText("");
-            //etTitulo.requestFocus();
+            limparCampos();
         });
 
         linearLayout.setVisibility(View.GONE);
@@ -131,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     private void cadastrarMusica() {
         MusicaDAL dal = new MusicaDAL(this);
 
-        Musica musica=new Musica(
+        Musica musica = new Musica(
                 Integer.parseInt(etAno.getText().toString()),
                 etTitulo.getText().toString(),
                 etInterprete.getText().toString(),
@@ -143,10 +149,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void atualizarMusica(Musica musica) {
-        musica.setTitulo(etTitulo.getText().toString());
-        MusicaDAL dal = new MusicaDAL(this);
-        dal.alterar(musica);
-        this.atualizarDados();
+        try{
+            musica.setTitulo(etTitulo.getText().toString());
+            musica.setAno(Integer.parseInt(etAno.getText().toString()));
+            musica.setDuracao(Double.parseDouble(etDuracao.getText().toString()));
+            musica.setGenero(generoSelecionado);
+            musica.setInterprete(etInterprete.getText().toString());
+            MusicaDAL dal = new MusicaDAL(this);
+            dal.alterar(musica);
+            this.atualizarDados();
+        }catch(Error e){
+            System.out.println(e);
+        }
     }
 
     private void apagarMusica(Musica musica){
@@ -156,9 +170,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void atualizarDados(){
-        this.musicas=new MusicaDAL(this).get("");
-        ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this,
-                android.R.layout.simple_list_item_1,musicas);
+        this.musicas= new MusicaDAL(this).get("");
+        ArrayAdapter<Musica> adapter=new ArrayAdapter(this, android.R.layout.simple_list_item_1 ,musicas);
         lvMusica.setAdapter(adapter);
     }
 
@@ -185,12 +198,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 System.out.println(s);
-                buscarMusica("gen_nome like '%" + s +"%'");
+                buscarMusica("mus_titulo like '%" + s +"%' OR mus_interprete like '%" + s +"%'");
                 return false;
             }
         });
         ;
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void limparCampos(){
+        etTitulo.setText("");
+        etTitulo.requestFocus();
+        etAno.setText("");
+        etAno.requestFocus();
+        etDuracao.setText("");
+        etDuracao.requestFocus();
+        etInterprete.setText("");
+        etInterprete.requestFocus();
+        generoSelecionado = null;
     }
 
     @Override
@@ -199,8 +224,7 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.itmusica:
                 linearLayout.setVisibility(View.VISIBLE);
-                etTitulo.setText("");
-                etTitulo.requestFocus();
+                limparCampos();
                 break;
             case R.id.itcategoria:
                 Intent intent = new Intent(this,CategoriaActivity.class);
