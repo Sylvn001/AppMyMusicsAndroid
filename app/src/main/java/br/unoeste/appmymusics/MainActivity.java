@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -25,6 +26,7 @@ import java.util.List;
 import br.unoeste.appmymusics.db.bean.Genero;
 import br.unoeste.appmymusics.db.bean.Musica;
 import br.unoeste.appmymusics.db.bean.Musica;
+import br.unoeste.appmymusics.db.dal.GeneroDAL;
 import br.unoeste.appmymusics.db.dal.MusicaDAL;
 import br.unoeste.appmymusics.db.dal.MusicaDAL;
 
@@ -35,10 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText etTitulo;
     private EditText etAno;
     private EditText etInterprete;
-    private EditText etGenero;
     private EditText etDuracao;
 
+    private Genero generoSelecionado;
 
+    private AutoCompleteTextView autoCompleteTxt;
+    ArrayAdapter<Genero> adapterGeneros;
     private FloatingActionButton fabNovaMusica;
     private LinearLayout linearLayout;
     private ArrayList<Musica> musicas;
@@ -49,19 +53,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ListView lvMusica = findViewById(R.id.lvMusicas);
         linearLayout = findViewById(R.id.linearLayoutMusica);
         btConfirmar=findViewById(R.id.btConfirmarMusica);
 
-        // textos para input etc
+        etTitulo = findViewById(R.id.etTituloMusica);
+        etAno = findViewById(R.id.etAno);
+        etDuracao = findViewById(R.id.etDuracao);
+        etInterprete = findViewById(R.id.etInterprete);
 
+        //Categorias
+        ArrayList<Genero> generos = new GeneroDAL(this).get("");
+        adapterGeneros = new ArrayAdapter<Genero>(this, R.layout.list_item, generos);
+        autoCompleteTxt = findViewById(R.id.auto_complete_txt);
+        autoCompleteTxt.setAdapter(adapterGeneros);
+        autoCompleteTxt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Genero genero = (Genero) adapterView.getItemAtPosition(i);
+                generoSelecionado = genero;
+            }
+        });
 
         this.musicas= new MusicaDAL(this).get("");
         ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
         lvMusica.setAdapter(adapter);
-
-
         lvMusica.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -71,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 musica = musicaEncontrado;
             }
         });
-
         lvMusica.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -115,13 +130,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void cadastrarMusica() {
         MusicaDAL dal = new MusicaDAL(this);
-//        Musica musica=new Musica(
-//                etTitulo.getText().toString(),
-//                etAno.getText().toString(),
-//                etInterprete.getText().toString(),
-//                new Genero(etGenero.getText()),
-//                Double.parseDouble(etDuracao.getText().toString())
-//        );
+
+        Musica musica=new Musica(
+                Integer.parseInt(etAno.getText().toString()),
+                etTitulo.getText().toString(),
+                etInterprete.getText().toString(),
+                generoSelecionado,
+                Double.parseDouble(etDuracao.getText().toString())
+        );
         dal.salvar(musica);
         this.atualizarDados();
     }
