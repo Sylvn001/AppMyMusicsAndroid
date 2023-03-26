@@ -88,11 +88,10 @@ public class CategoriaActivity extends AppCompatActivity {
         linearLayout.setVisibility(View.GONE);
         btConfirmar.setOnClickListener(e->{
             if(genero != null){
-                atualizarGenero(genero);
+                atualizarGenero();
             }else{
                 cadastrarGenero();
             }
-            genero = null;
             linearLayout.setVisibility(View.GONE);
         });
     }
@@ -104,9 +103,10 @@ public class CategoriaActivity extends AppCompatActivity {
         this.atualizarDados();
     }
 
-    private void atualizarGenero(Genero genero) {
+    private void atualizarGenero() {
         genero.setNome(etGenero.getText().toString());
         GeneroDAL dal = new GeneroDAL(this);
+        System.out.println(genero.getId());
         dal.alterar(genero);
         this.atualizarDados();
     }
@@ -119,6 +119,7 @@ public class CategoriaActivity extends AppCompatActivity {
 
     private void atualizarDados(){
         this.generos=new GeneroDAL(this).get("");
+        this.genero = null;
         ArrayAdapter<Genero> adapter=new ArrayAdapter<Genero>(this,
                 android.R.layout.simple_list_item_1,generos);
         lvCategoria.setAdapter(adapter);
