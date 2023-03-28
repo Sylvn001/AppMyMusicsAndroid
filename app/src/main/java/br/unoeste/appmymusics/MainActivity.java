@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         autoCompleteTxt.setText(adapterGeneros.getItem(0).toString(), false);
-        generoSelecionado = adapterGeneros.getItem(0);
 
         this.musicas= new MusicaDAL(this).get("");
         ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
@@ -146,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     private void cadastrarMusica() {
         try{
             MusicaDAL dal = new MusicaDAL(this);
-
+            System.out.println(generoSelecionado.getNome());
             Musica musica = new Musica(
                     Integer.parseInt(etAno.getText().toString()),
                     etTitulo.getText().toString(),
@@ -173,15 +172,20 @@ public class MainActivity extends AppCompatActivity {
             MusicaDAL dal = new MusicaDAL(this);
             dal.alterar(musica);
             this.atualizarDados();
-        }catch(Error e){
+        }catch(Exception e){
             System.out.println(e);
         }
     }
 
     private void apagarMusica(Musica musica){
-        MusicaDAL dal = new MusicaDAL(this);
-        dal.apagar(musica.getId());
-        this.atualizarDados();
+        try{
+            MusicaDAL dal = new MusicaDAL(this);
+            dal.apagar(musica.getId());
+            this.atualizarDados();
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 
     private void atualizarDados(){
@@ -232,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         etDuracao.requestFocus();
         etInterprete.setText("");
         etInterprete.requestFocus();
-        generoSelecionado = null;
+        generoSelecionado = adapterGeneros.getItem(0);
         musica = null;
     }
 
