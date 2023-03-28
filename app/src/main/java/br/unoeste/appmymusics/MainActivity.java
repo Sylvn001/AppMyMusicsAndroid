@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         autoCompleteTxt.setText(adapterGeneros.getItem(0).toString(), false);
+        generoSelecionado = adapterGeneros.getItem(0);
 
         this.musicas= new MusicaDAL(this).get("");
         ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                             && adapterGeneros.getItem(posItem).getNome().compareToIgnoreCase(generoSelecionado.getNome()) != 0; posItem++){}
 
                 autoCompleteTxt.setText(adapterGeneros.getItem(posItem).toString(), false);
-
+                generoSelecionado = adapterGeneros.getItem(posItem);
             }
         });
         lvMusica.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -143,17 +144,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void cadastrarMusica() {
-        MusicaDAL dal = new MusicaDAL(this);
+        try{
+            MusicaDAL dal = new MusicaDAL(this);
 
-        Musica musica = new Musica(
-                Integer.parseInt(etAno.getText().toString()),
-                etTitulo.getText().toString(),
-                etInterprete.getText().toString(),
-                generoSelecionado,
-                Double.parseDouble(etDuracao.getText().toString())
-        );
-        dal.salvar(musica);
-        this.atualizarDados();
+            Musica musica = new Musica(
+                    Integer.parseInt(etAno.getText().toString()),
+                    etTitulo.getText().toString(),
+                    etInterprete.getText().toString(),
+                    generoSelecionado,
+                    Double.parseDouble(etDuracao.getText().toString())
+            );
+            dal.salvar(musica);
+            System.out.println(musica.getGenero().getNome());
+            System.out.println(musica.toString());
+            this.atualizarDados();
+        }catch(Exception e){
+            System.out.println(e);
+        }
     }
 
     private void atualizarMusica() {
@@ -182,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<Musica> adapter=new ArrayAdapter(this, android.R.layout.simple_list_item_1 ,musicas);
         lvMusica.setAdapter(adapter);
         this.musica = null;
+        this.limparCampos();
     }
 
     private void buscarMusica(String text){
