@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,13 +21,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import br.unoeste.appmymusics.db.bean.Genero;
 import br.unoeste.appmymusics.db.bean.Musica;
-import br.unoeste.appmymusics.db.bean.Musica;
 import br.unoeste.appmymusics.db.dal.GeneroDAL;
-import br.unoeste.appmymusics.db.dal.MusicaDAL;
 import br.unoeste.appmymusics.db.dal.MusicaDAL;
 
 public class MainActivity extends AppCompatActivity {
@@ -79,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         autoCompleteTxt.setText(adapterGeneros.getItem(0).toString(), false);
 
         this.musicas= new MusicaDAL(this).get("");
-        ArrayAdapter<Musica> adapter=new ArrayAdapter<Musica>(this, android.R.layout.simple_list_item_1,musicas);
+        MusicaAdapter adapter = new MusicaAdapter(this, R.layout.item_layout,musicas);
         lvMusica.setAdapter(adapter);
         lvMusica.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

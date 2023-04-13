@@ -1,6 +1,8 @@
 package br.unoeste.appmymusics.db.bean;
 
 
+import br.unoeste.appmymusics.db.bean.Genero;
+
 public class Musica {
 
     private int id, ano;
