@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         lvMusica.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println("cliquei nessa porra");
                 linearLayout.setVisibility(View.VISIBLE);
                 Musica musicaEncontrado = musicas.get(i);
                 etTitulo.setText(musicaEncontrado.getTitulo().toString());
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void atualizarDados(){
         this.musicas= new MusicaDAL(this).get("");
-        ArrayAdapter<Musica> adapter=new ArrayAdapter(this, android.R.layout.simple_list_item_1 ,musicas);
+        MusicaAdapter adapter = new MusicaAdapter(this, R.layout.item_layout,musicas);
         lvMusica.setAdapter(adapter);
         this.musica = null;
         this.limparCampos();

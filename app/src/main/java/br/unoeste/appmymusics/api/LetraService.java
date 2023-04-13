@@ -6,5 +6,5 @@ import retrofit2.http.Query;
 
 public interface LetraService {
     @GET("search.php")
-    Call<Letra> buscarLetra(@Query("apikey") String apikey, @Query("artista") String artista ,@Query("musica") String musica);
+    Call<Letra> buscarLetra(@Query("apikey") String apikey, @Query("art") String artista ,@Query("mus") String musica);
 }

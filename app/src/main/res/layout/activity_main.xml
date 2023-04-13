@@ -13,31 +13,32 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="60dp"
         android:clickable="true"
+        app:backgroundTint="#9E6EF4"
         app:layout_constraintBottom_toTopOf="@+id/linearLayoutMusica"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/baseline_add_circle_outline_24" />
 
-    <ListView
-        android:id="@+id/lvMusicas"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lvMusicas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayoutMusica"
         android:layout_width="408dp"
         android:layout_height="353dp"
         android:background="#463495"
-        android:backgroundTint="#C1E7F8"
+        android:backgroundTint="#7D8FF3"
         android:fadeScrollbars="false"
         android:gravity="center"
         android:isScrollContainer="false"
@@ -104,7 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#2196F3"
+            android:backgroundTint="#463495"
             android:text="Confirmar" />
     </LinearLayout>
 

@@ -17,4 +17,36 @@ public class Letra {
                 ", badwords=" + badwords +
                 '}';
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Art getArt() {
+        return art;
+    }
+
+    public void setArt(Art art) {
+        this.art = art;
+    }
+
+    public ArrayList<Mu> getMus() {
+        return mus;
+    }
+
+    public void setMus(ArrayList<Mu> mus) {
+        this.mus = mus;
+    }
+
+    public boolean isBadwords() {
+        return badwords;
+    }
+
+    public void setBadwords(boolean badwords) {
+        this.badwords = badwords;
+    }
 }

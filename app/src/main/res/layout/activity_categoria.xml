@@ -35,8 +35,8 @@
         android:id="@+id/linearLayoutCategoria"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="#4B2196F3"
-        android:backgroundTint="#2196F3"
+        android:background="#7D8FF3"
+        android:backgroundTint="#7D8FF3"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent">

@@ -27,9 +27,9 @@ public class MusicaAdapter extends ArrayAdapter<Musica> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
         if(convertView == null){{
-            LayoutInflater inflater = (LayoutInflater)
-                    getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(this.layout, parent, false);
         }}
 
@@ -50,12 +50,12 @@ public class MusicaAdapter extends ArrayAdapter<Musica> {
 
         Button btnLetra = convertView.findViewById(R.id.btnLetra);
         btnLetra.setOnClickListener(e -> {
+
             Intent letraActivity = new Intent(getContext(), LetraActivity.class);
-            letraActivity.putExtra("artista", interprete.toString());
-            letraActivity.putExtra("musica", titulo.toString());
+            letraActivity.putExtra("artista", musica.getInterprete());
+            letraActivity.putExtra("musica", musica.getTitulo());
             getContext().startActivity(letraActivity);
         });
-
 
         return convertView;
     }
